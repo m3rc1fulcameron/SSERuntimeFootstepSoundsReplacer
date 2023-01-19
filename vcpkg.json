@@ -48,5 +48,6 @@
         "scripts-dev",
         "plugin",
         "tests"
-    ]
+    ],
+    "overrides": [ { "name": "ryml", "version": "2021-07-24#1" } ]
 }
