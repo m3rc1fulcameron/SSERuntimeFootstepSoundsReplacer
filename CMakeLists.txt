@@ -5,7 +5,7 @@ message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}.")
 ## Define project
 ########################################################################################################################
 project(
-        CommonLibSSESamplePlugin
+        RuntimeFootstepSounds
         VERSION 1.0.0
         DESCRIPTION "A sample SKSE plugin built with CommonLibSSE."
         LANGUAGES CXX)
@@ -21,18 +21,20 @@ configure_file(
         @ONLY)
 
 set(headers
-        include/Sample/Sample.h)
+        include/Sample/Sample.h
+        include/Sample/RulesManager.h
+        include/Sample/RulesParser.h)
 
 set(sources
         src/Config.cpp
-        src/HitCounterManager.cpp
         src/Main.cpp
-        src/Papyrus.cpp
+        src/Hooking.cpp
+        src/RulesManager.cpp
+        src/RulesParser.cpp
 
         ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
-set(tests
-        test/HitCounterManager.cpp)
+#set(tests)
 
 source_group(
         TREE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -67,7 +69,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/Sample>)
 
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
@@ -86,30 +88,30 @@ install(TARGETS ${PROJECT_NAME}
 ########################################################################################################################
 ## Configure unit tests
 ########################################################################################################################
-if(BUILD_TESTS)
-    find_package(Catch2 CONFIG REQUIRED)
-
-    include(CTest)
-    include(Catch)
-
-    add_executable(
-            ${PROJECT_NAME}Tests
-            ${headers}
-            ${tests})
-
-    target_link_libraries(
-            ${PROJECT_NAME}Tests
-            PRIVATE
-            ${PROJECT_NAME}
-            Catch2::Catch2WithMain)
-
-    target_precompile_headers(${PROJECT_NAME}Tests
-            PRIVATE
-            src/PCH.h)
-
-    catch_discover_tests(${PROJECT_NAME}Tests)
-    add_test(NAME ${PROJECT_NAME}Tests COMMAND ${PROJECT_NAME}Tests)
-endif()
+#if(BUILD_TESTS)
+#    find_package(Catch2 CONFIG REQUIRED)
+#
+#    include(CTest)
+#    include(Catch)
+#
+#    add_executable(
+#            ${PROJECT_NAME}Tests
+#            ${headers}
+#            ${tests})
+#
+#    target_link_libraries(
+#            ${PROJECT_NAME}Tests
+#            PRIVATE
+#            ${PROJECT_NAME}
+#            Catch2::Catch2WithMain)
+#
+#    target_precompile_headers(${PROJECT_NAME}Tests
+#            PRIVATE
+#            src/PCH.h)
+#
+#    catch_discover_tests(${PROJECT_NAME}Tests)
+#    add_test(NAME ${PROJECT_NAME}Tests COMMAND ${PROJECT_NAME}Tests)
+#endif()
 
 ########################################################################################################################
 ## Automatic plugin deployment

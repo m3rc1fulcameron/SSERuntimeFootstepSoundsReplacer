@@ -1,0 +1,7 @@
+debug:
+  logLevel: info
+  flushLevel: trace
+plugin:
+  name: Heels Sound.esm
+  keyword: ClothingHH
+  footstep_set_formid: 0x4527

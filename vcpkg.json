@@ -1,10 +1,9 @@
 {
     "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
-    "name": "commonlibsse-sample-plugin",
+    "name": "runtime-footstep-sounds-plugin",
     "version-string": "1.0.0",
     "port-version": 0,
-    "description": "Sample SKSE plugin based on CommonLibSSE, for unified AE/SE/VR deployment.",
-    "homepage": "https://www.skyrimng.com",
+    "description": "SKSE plugin based on CommonLibSSE, for dynamically replacing footstep sounds to be played at runtime based off of TOML configuration files.",
     "license": "Apache-2.0",
     "features": {
         "scripts": {
@@ -34,13 +33,14 @@
             "description": "Build tests for the SKSE plugin.",
             "dependencies": [
                 {
-                    "name": "commonlibsse-sample-plugin",
+                    "name": "runtime-footstep-sounds-plugin",
                     "default-features": false,
                     "features": [
                         "plugin"
                     ]
                 },
-                "catch2"
+                "catch2",
+                "tomlplusplus"
             ]
         }
     },

@@ -42,9 +42,7 @@ namespace Sample {
 
     class Config {
     public:
-        [[nodiscard]] inline const Debug& GetDebug() const noexcept {
-            return _debug;
-        }
+        [[nodiscard]] inline const Debug& GetDebug() const noexcept { return _debug; }
 
         [[nodiscard]] static const Config& GetSingleton() noexcept;
 

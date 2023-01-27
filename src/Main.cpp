@@ -1,7 +1,6 @@
-#include <Sample/HitCounterManager.h>
-
 #include "Config.h"
-#include "Papyrus.h"
+#include "Hooking.h"
+#include "RulesManager.h"
 
 #include <stddef.h>
 
@@ -48,55 +47,6 @@ namespace {
     }
 
     /**
-     * Initialize the SKSE cosave system for our plugin.
-     *
-     * <p>
-     * SKSE comes with a feature called a <em>cosave</em>, an additional save file kept alongside the original Skyrim
-     * save file. SKSE plugins can write their own data to this file, and load it again when the save game is loaded,
-     * allowing them to keep custom data along with a player's save. Each plugin must have a unique ID, which is four
-     * characters long (similar to the record names used by forms in ESP files). Note however this is little-endian, so
-     * technically the 'SMPL' here ends up as 'LPMS' in the save file, unless we use a byte order swap.
-     * </p>
-     *
-     * <p>
-     * There can only be one serialization callback for save, revert (called on new game and before a load), and load
-     * for the entire plugin.
-     * </p>
-     */
-    void InitializeSerialization() {
-        log::trace("Initializing cosave serialization...");
-        auto* serde = GetSerializationInterface();
-        serde->SetUniqueID(_byteswap_ulong('SMPL'));
-        serde->SetSaveCallback(Sample::HitCounterManager::OnGameSaved);
-        serde->SetRevertCallback(Sample::HitCounterManager::OnRevert);
-        serde->SetLoadCallback(Sample::HitCounterManager::OnGameLoaded);
-        log::trace("Cosave serialization initialized.");
-    }
-
-    /**
-     * Initialize our Papyrus extensions.
-     *
-     * <p>
-     * A common use of SKSE is to add new Papyrus functions. You can call a registration callback to do this. This
-     * callback will not necessarily be called immediately, if the Papyrus VM has not been initialized yet (in that case
-     * it's execution is delayed until the VM is available).
-     * </p>
-     *
-     * <p>
-     * You can call the <code>Register</code> function as many times as you want and at any time you want to register
-     * additional functions.
-     * </p>
-     */
-    void InitializePapyrus() {
-        log::trace("Initializing Papyrus binding...");
-        if (GetPapyrusInterface()->Register(Sample::RegisterHitCounter)) {
-            log::debug("Papyrus functions bound.");
-        } else {
-            stl::report_and_fail("Failure to register Papyrus bindings.");
-        }
-    }
-
-    /**
      * Initialize the trampoline space for function hooks.
      *
      * <p>
@@ -115,7 +65,7 @@ namespace {
     void InitializeHooking() {
         log::trace("Initializing trampoline...");
         auto& trampoline = GetTrampoline();
-        trampoline.create(64);
+        trampoline.create(128);
         log::trace("Trampoline initialized.");
 
         Sample::InitializeHook(trampoline);
@@ -143,6 +93,7 @@ namespace {
      */
     void InitializeMessaging() {
         if (!GetMessagingInterface()->RegisterListener([](MessagingInterface::Message* message) {
+            volatile const RulesManager* rm;
             switch (message->type) {
                 // Skyrim lifecycle events.
                 case MessagingInterface::kPostLoad: // Called after all plugins have finished running SKSEPlugin_Load.
@@ -152,6 +103,8 @@ namespace {
                     break;
                 case MessagingInterface::kDataLoaded: // All ESM/ESL/ESP plugins have loaded, main menu is now active.
                     // It is now safe to access form data.
+                    log::info("Trying to initialize hook");
+                    rm = &RulesManager::GetSingleton();
                     InitializeHooking();
                     break;
 
@@ -192,8 +145,6 @@ SKSEPluginLoad(const LoadInterface* skse) {
 
     Init(skse);
     InitializeMessaging();
-    InitializeSerialization();
-    InitializePapyrus();
 
     log::info("{} has finished loading.", plugin->GetName());
     return true;
