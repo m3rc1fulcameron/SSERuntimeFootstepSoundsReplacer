@@ -1,0 +1,20 @@
+# TOML rule for HH FSS replacement
+
+[[rules]]
+name = "HH FSS Replacer"
+priority = 1000
+replacement = { mod = "Heels Sound.esm", "formID" = 0x4527 }
+short_circuit = true
+evaluate = "any" # "any" or "all"
+conditions = [
+	{ pred = "AND", preds = [
+		{ pred = "actor.isFemale" },
+		{ pred = "armor.feet.hasKeyword", keyword = "ClothingHH" },
+		{ pred = "OR", not = true, preds = [
+			{ pred = "armor.feet.hasKeyword", keyword = "zad_DeviousBoots" },
+			{ pred = "footstepSet", mod = "Devious Devices - Expansion.esm", formID = 0x13222 },
+			{ pred = "footstepSet", mod = "Devious Devices - Expansion.esm", formID = 0x13298 },
+			{ pred = "footstepSet", mod = "Devious Devices - Expansion.esm", formID = 0x1332b }
+		] }
+	] }
+]
